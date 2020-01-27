@@ -4,6 +4,9 @@
         "allowJs": true,
         "target": "ESNext",
         "lib": ["ESNext", "DOM"],
-        "downlevelIteration": true
+        "downlevelIteration": true,
+        "declaration": true,
+        "outDir": "dist"
     },
+    "include": ["./src"],
 }
