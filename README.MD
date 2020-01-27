@@ -1,6 +1,6 @@
-# nging-format
+# nginx-format
 Library for formating nginx config files
-### Instalation
+### Installation
 ```
 npm install nginx-format --save
 ```
