@@ -21,6 +21,6 @@ console.log(formattedConfig)
 const formattedConfig = nginxFormat(configString,{
 	indent: '\t',
 	newLineSeparator: '\n',
-	maxStatementLength: 80,
+	maxStatementLength: 80, // if statement is longer than that it will be splitted into multiple lines
 })
 ```
