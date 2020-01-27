@@ -1,5 +1,5 @@
 import { expect } from "chai"
-import { formatNginxConfig } from "../src/index"
+import { nginxFormat } from "../src/index"
 
 
 const testCases = [
@@ -49,6 +49,15 @@ user # comment
 	1;`,
 		message: 'should work with comments between statement'
 	},
+
+	{
+		input: `user       www www;  ## Default: nobody
+worker_processes  5;  ## Default: 1`,
+		expect: `user www www; ## Default: nobody
+worker_processes 5; ## Default: 1`,
+		message: 'should work with comments'
+	},
+
 
 	{
 		input: `
@@ -184,13 +193,31 @@ server {
 	},
 
 	{
-		
 		input: `#comment
 user user;`,
 		expect: `#comment
 user user;`,
 		message: 'should not trim comment on first line'
 	},
+
+	{
+		input: `#comment
+
+		#comment
+		#comment
+
+
+user user;`,
+		expect: `#comment
+
+#comment
+#comment
+
+
+user user;`,
+		message: 'leading comments'
+	},
+
 
 
 	{
@@ -303,7 +330,7 @@ describe('formatNginxConfig', () => {
 
 	for (const testCase of onlyTestCase ? [onlyTestCase] : testCases) {
 		it(testCase.message, () => {
-			expect(formatNginxConfig(testCase.input, (testCase as any).options || {})).to.eq(testCase.expect)
+			expect(nginxFormat(testCase.input, (testCase as any).options || {})).to.eq(testCase.expect)
 		})
 	}
 

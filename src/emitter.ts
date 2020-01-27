@@ -4,7 +4,7 @@ import { IFormatingOptions } from "."
 
 export class FormatedEmitter {
 
-    constructor(private options: Required<IFormatingOptions>) {}
+    constructor(private options: Required<IFormatingOptions>) { }
 
     private commentsMap = new Map<number, IToken>()
     private lastCommentLine = 0
@@ -23,10 +23,32 @@ export class FormatedEmitter {
         return this.options.indent.repeat(level)
     }
 
-    generateOutput(ast: ASTElement[], comments: IToken[]) {
-        this.groupCommentsByLine(comments)
-        let blocksResult = this.block(ast, 0, 1)
+    private addComments(comments: IToken[], lastLine: number) {
+        let res = ''
+        for (const comment of comments) {
+            let lineDiff = comment.startLine - lastLine
+            lastLine = comment.endLine
+            res += this.options.newLineSeparator.repeat(lineDiff)
+            res += comment.image
+        }
+        return res
+    }
 
+    generateOutput(ast: ASTElement[], comments: IToken[]) {
+
+        this.groupCommentsByLine(comments)
+
+        const configStart = ast.length ? ast[0].startLine : 0
+
+        const commentsBeforeConfig = this.getCommentsBetweenLines(1, configStart - 1)
+
+        let blocksResult = this.addComments(commentsBeforeConfig, 1)
+
+        const lastLeadingCommentLine = commentsBeforeConfig.length
+            ? commentsBeforeConfig[commentsBeforeConfig.length - 1].startLine
+            : 1
+
+        blocksResult += this.block(ast, 0, lastLeadingCommentLine)
 
         const commentsAfterConfig = this.getCommentsBetweenLines(
             ast.length ? ast[ast.length - 1].endLine + 1 : 1,
@@ -34,14 +56,7 @@ export class FormatedEmitter {
         )
 
         let lastLine = ast.length ? ast[ast.length - 1].endLine : 1
-        for (const comment of commentsAfterConfig) {
-
-            let lineDiff = comment.startLine - lastLine
-            lastLine = comment.endLine
-            blocksResult += '\n'.repeat(lineDiff)
-            blocksResult += comment.image
-        }
-
+        blocksResult += this.addComments(commentsAfterConfig, lastLine)
         return blocksResult
     }
 
@@ -109,20 +124,19 @@ export class FormatedEmitter {
         for (const el of ast) {
             let lineDiff = el.startLine - lastLine
             const freeComments = this.getCommentsBetweenLines(
-                lastLine + (level === 0 ? 0 : 1),
+                lastLine + 1,
                 el.startLine - 1,
             )
 
+            res += this.addComments(freeComments, lastLine)
 
-            for (const comment of freeComments) {
-                lineDiff = comment.startLine - lastLine
-                lastLine = comment.startLine
-                res += '\n'.repeat(lineDiff)
-                res += this.generateIndent(level) + comment.image
+            if (freeComments.length) {
+                lastLine = freeComments[freeComments.length - 1].startLine
             }
+
             lineDiff = el.startLine - lastLine
             lastLine = el.endLine
-            res += '\n'.repeat(lineDiff)
+            res += this.options.newLineSeparator.repeat(lineDiff)
             res += this.statement(el, level)
         }
         return res
@@ -144,7 +158,7 @@ export class FormatedEmitter {
         const groupSize = (group: IToken[]) => group.map(x => x.image).join(' ').length
 
         const joinCommentToLastArgument = (group: IToken[]) => {
-            if(group[group.length - 1].tokenType.name === 'Comment') {
+            if (group[group.length - 1].tokenType.name === 'Comment') {
                 const comment = group[group.length - 1]
                 group.splice(group.length - 1, 1)
                 group[group.length - 1].image += ' ' + comment.image
@@ -155,7 +169,7 @@ export class FormatedEmitter {
 
         const firstGroup = groups[0]
 
-        if(groupSize(firstGroup) > this.options.maxStatementLength) {
+        if (groupSize(firstGroup) > this.options.maxStatementLength) {
             joinCommentToLastArgument(firstGroup)
             newGroups.push([firstGroup[0], firstGroup[1]].filter(x => x))
             newGroups.push(...firstGroup.slice(2).map(x => [x]))
@@ -164,7 +178,7 @@ export class FormatedEmitter {
         }
 
 
-        for(const group of groups.slice(1)) {
+        for (const group of groups.slice(1)) {
             if (groupSize(group) > this.options.maxStatementLength) {
                 joinCommentToLastArgument(group)
                 newGroups.push(...group.map(x => [x]))
@@ -195,7 +209,7 @@ export class FormatedEmitter {
             ...groups.slice(1).map(
                 group => this.generateIndent(level + 1) + group.map(x => x.image).join(' ')
             )
-        ].join('\n')
+        ].join(this.options.newLineSeparator)
 
     }
 
@@ -212,7 +226,7 @@ export class FormatedEmitter {
 
         let res = groups.filter(x => x.length).map(
             group => this.generateIndent(level).repeat(level) + group.map(x => x.image).join(' ')
-        ).join('\n')
+        ).join(this.options.newLineSeparator)
 
         res += this.block(statement.block, level + 1, statement.blockStart)
 
