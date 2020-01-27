@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "allowJs": true,
+        "target": "ESNext",
+        "lib": ["ESNext", "DOM"],
+        "downlevelIteration": true
+    },
+}
