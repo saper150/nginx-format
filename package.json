@@ -1,7 +1,7 @@
 {
   "name": "nginx-format",
   "version": "1.0.0",
-  "description": "",
+  "description": "formatter for nginx config files",
   "main": "index.js",
   "dependencies": {
     "chevrotain": "^6.5.0"
@@ -18,6 +18,10 @@
   "scripts": {
     "test": "mocha -r ts-node/register --watch --watch-extensions ts tests/*.spec.ts"
   },
-  "author": "",
-  "license": "ISC"
+  "repository": {
+    "directory": "git",
+    "url": "https://github.com/saper150/nginx-format"
+  },
+  "author": "Marcin Wydrzyński",
+  "license": "MIT"
 }
