@@ -17,7 +17,8 @@
     "typescript": "^3.7.5"
   },
   "scripts": {
-    "test": "mocha -r ts-node/register --watch --watch-extensions ts tests/*.spec.ts"
+    "test": "mocha -r ts-node/register --watch --watch-extensions ts tests/*.spec.ts",
+    "prepublish": "tsc"
   },
   "repository": {
     "directory": "git",
