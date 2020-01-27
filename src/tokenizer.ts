@@ -1,5 +1,5 @@
 
-import * as chevrotain from '../node_modules/chevrotain/lib/chevrotain'
+import * as chevrotain from 'chevrotain/lib/chevrotain'
 
 const createToken = chevrotain.createToken
 

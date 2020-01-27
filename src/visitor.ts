@@ -1,6 +1,6 @@
 
 import { Parser } from './parser'
-import { IToken } from '../node_modules/chevrotain/lib/chevrotain'
+import { IToken } from 'chevrotain/lib/chevrotain'
 
 export interface ASTElement {
     type: 'blockStatement' | 'statement' | 'comment'
