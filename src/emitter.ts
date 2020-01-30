@@ -2,6 +2,11 @@ import { ASTElement } from "./visitor"
 import { IToken } from "chevrotain"
 import { IFormatingOptions } from "."
 
+
+function lastElement<T>(arr: T[]): T {
+    return arr[arr.length - 1]
+}
+
 export class FormatedEmitter {
 
     constructor(private options: Required<IFormatingOptions>) { }
@@ -23,13 +28,13 @@ export class FormatedEmitter {
         return this.options.indent.repeat(level)
     }
 
-    private addComments(comments: IToken[], lastLine: number) {
+    private addComments({ comments, level, lastLine }: { comments: IToken[]; level: number; lastLine: number }) {
         let res = ''
         for (const comment of comments) {
             let lineDiff = comment.startLine - lastLine
             lastLine = comment.endLine
             res += this.options.newLineSeparator.repeat(lineDiff)
-            res += comment.image
+            res += this.generateIndent(level) + comment.image
         }
         return res
     }
@@ -42,21 +47,21 @@ export class FormatedEmitter {
 
         const commentsBeforeConfig = this.getCommentsBetweenLines(1, configStart - 1)
 
-        let blocksResult = this.addComments(commentsBeforeConfig, 1)
+        let blocksResult = this.addComments({ comments: commentsBeforeConfig, level: 0, lastLine: 1 })
 
         const lastLeadingCommentLine = commentsBeforeConfig.length
-            ? commentsBeforeConfig[commentsBeforeConfig.length - 1].startLine
+            ? lastElement(commentsBeforeConfig).startLine
             : 1
 
         blocksResult += this.block(ast, 0, lastLeadingCommentLine)
 
         const commentsAfterConfig = this.getCommentsBetweenLines(
-            ast.length ? ast[ast.length - 1].endLine + 1 : 1,
+            ast.length ? lastElement(ast).endLine + 1 : 1,
             this.lastCommentLine,
         )
 
-        let lastLine = ast.length ? ast[ast.length - 1].endLine : 1
-        blocksResult += this.addComments(commentsAfterConfig, lastLine)
+        let lastLine = ast.length ? lastElement(ast).endLine : 1
+        blocksResult += this.addComments({ comments: commentsAfterConfig, level: 0, lastLine })
         return blocksResult
     }
 
@@ -128,10 +133,10 @@ export class FormatedEmitter {
                 el.startLine - 1,
             )
 
-            res += this.addComments(freeComments, lastLine)
+            res += this.addComments({ comments: freeComments, level, lastLine })
 
             if (freeComments.length) {
-                lastLine = freeComments[freeComments.length - 1].startLine
+                lastLine = lastElement(freeComments).startLine
             }
 
             lineDiff = el.startLine - lastLine
@@ -139,6 +144,7 @@ export class FormatedEmitter {
             res += this.options.newLineSeparator.repeat(lineDiff)
             res += this.statement(el, level)
         }
+
         return res
     }
 
@@ -158,10 +164,10 @@ export class FormatedEmitter {
         const groupSize = (group: IToken[]) => group.map(x => x.image).join(' ').length
 
         const joinCommentToLastArgument = (group: IToken[]) => {
-            if (group[group.length - 1].tokenType.name === 'Comment') {
-                const comment = group[group.length - 1]
+            if (lastElement(group).tokenType.name === 'Comment') {
+                const comment = lastElement(group)
                 group.splice(group.length - 1, 1)
-                group[group.length - 1].image += ' ' + comment.image
+                lastElement(group).image += ' ' + comment.image
             }
         }
 
@@ -229,6 +235,19 @@ export class FormatedEmitter {
         ).join(this.options.newLineSeparator)
 
         res += this.block(statement.block, level + 1, statement.blockStart)
+
+        if (statement.block.length) {
+            const endBlockComments = this.getCommentsBetweenLines(
+                lastElement(statement.block).endLine + 1,
+                statement.endLine - 1
+            )
+
+            res += this.addComments({
+                comments: endBlockComments,
+                level: level + 1,
+                lastLine: lastElement(statement.block).startLine
+            })
+        }
 
         const blockEndComment = this.commentsMap.get(statement.endLine)
 

@@ -322,6 +322,20 @@ http {
 		message: 'should respect maxStatementLength'
 	},
 
+	{
+		input: `
+http {
+	workers 10;
+#comment
+}`,
+		expect: `
+http {
+	workers 10;
+	#comment
+}`,
+		message: 'should indent comments in block'
+	},
+
 ]
 
 describe('formatNginxConfig', () => {
