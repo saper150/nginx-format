@@ -229,13 +229,12 @@ export class FormatedEmitter {
             )
         )
 
-
         let res = groups.filter(x => x.length).map(
-            group => this.generateIndent(level).repeat(level) + group.map(x => x.image).join(' ')
+            group => this.generateIndent(level) + group.map(x => x.image).join(' ')
         ).join(this.options.newLineSeparator)
 
         res += this.block(statement.block, level + 1, statement.blockStart)
-        
+
         let lastLine = lastElement(statement.block) ? lastElement(statement.block).endLine : statement.blockStart
 
         if (statement.block.length) {
@@ -252,7 +251,7 @@ export class FormatedEmitter {
             })
         }
 
-        res += this.options.newLineSeparator.repeat( statement.endLine - lastLine - 1 )
+        res += this.options.newLineSeparator.repeat(statement.endLine - lastLine - 1)
 
 
         const blockEndComment = this.commentsMap.get(statement.endLine)

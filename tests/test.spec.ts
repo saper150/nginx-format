@@ -9,7 +9,7 @@ const testCases = [
 		expect: 'error_log logs/error.log e;',
 		message: 'should remove whitespace between arguments'
 	},
- 
+
 	{
 		input: `
 error_log 
@@ -221,7 +221,7 @@ user user;`,
 
 
 	{
-		
+
 		input: `
 http {
 	user user;
@@ -351,6 +351,28 @@ http {
 }`,
 		message: 'should keep line separators between last statement and and of block'
 	},
+
+	{
+		only: true,
+		input: `
+http {
+	server {
+		location ~ \.php$ {
+			fastcgi_pass 127.0.0.1:1025;
+		}
+	}
+}`,
+		expect: `
+http {
+	server {
+		location ~ \.php$ {
+			fastcgi_pass 127.0.0.1:1025;
+		}
+	}
+}`,
+		message: 'nested blocks should have correct indentation'
+	},
+
 
 ]
 
