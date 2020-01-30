@@ -235,12 +235,15 @@ export class FormatedEmitter {
         ).join(this.options.newLineSeparator)
 
         res += this.block(statement.block, level + 1, statement.blockStart)
+        
+        let lastLine = lastElement(statement.block) ? lastElement(statement.block).endLine : statement.blockStart
 
         if (statement.block.length) {
             const endBlockComments = this.getCommentsBetweenLines(
                 lastElement(statement.block).endLine + 1,
                 statement.endLine - 1
             )
+            lastLine = lastElement(endBlockComments) ? lastElement(endBlockComments).startLine : lastLine
 
             res += this.addComments({
                 comments: endBlockComments,
@@ -249,9 +252,12 @@ export class FormatedEmitter {
             })
         }
 
+        res += this.options.newLineSeparator.repeat( statement.endLine - lastLine - 1 )
+
+
         const blockEndComment = this.commentsMap.get(statement.endLine)
 
-        res += '\n' + this.generateIndent(level) + '}' + (blockEndComment ? ' ' + blockEndComment.image : '')
+        res += this.options.newLineSeparator + this.generateIndent(level) + '}' + (blockEndComment ? ' ' + blockEndComment.image : '')
         return res
     }
 

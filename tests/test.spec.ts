@@ -336,6 +336,22 @@ http {
 		message: 'should indent comments in block'
 	},
 
+	{
+		input: `
+http {
+	workers 10;
+
+
+}`,
+		expect: `
+http {
+	workers 10;
+
+
+}`,
+		message: 'should keep line separators between last statement and and of block'
+	},
+
 ]
 
 describe('formatNginxConfig', () => {
