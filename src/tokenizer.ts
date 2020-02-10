@@ -27,7 +27,7 @@ const StringLiteral2 = createToken({
 
 const Text = createToken({
     name: 'Text',
-    pattern: /([^\s|;|\#]|\|)+/
+    pattern: /([^\s|;|\#|{]|\|)+/
 })
 
 const LCurly = createToken({name: "LCurly", pattern: /{/})
