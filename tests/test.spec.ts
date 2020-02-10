@@ -353,7 +353,6 @@ http {
 	},
 
 	{
-		only: true,
 		input: `
 http {
 	server {
@@ -373,6 +372,14 @@ http {
 		message: 'nested blocks should have correct indentation'
 	},
 
+	{
+		input: `
+http {}`,
+		expect: `
+http {
+}`,
+		message: 'single line empty block'
+	},
 
 ]
 

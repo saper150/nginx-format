@@ -251,7 +251,7 @@ export class FormatedEmitter {
             })
         }
 
-        res += this.options.newLineSeparator.repeat(statement.endLine - lastLine - 1)
+        res += this.options.newLineSeparator.repeat(Math.max(statement.endLine - lastLine - 1, 0))
 
 
         const blockEndComment = this.commentsMap.get(statement.endLine)
