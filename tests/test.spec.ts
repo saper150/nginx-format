@@ -381,6 +381,28 @@ http {
 		message: 'single line empty block'
 	},
 
+	{
+		input: `
+http{}`,
+		expect: `
+http {
+}`,
+		message: 'brace next to statement name'
+	},
+
+	{
+		only: false,
+		input: `
+http {end 123;
+}`,
+		expect: `
+http {
+	end 123;
+}`,
+		message: 'should statement on the same line that block to next line'
+	},
+
+
 ]
 
 describe('formatNginxConfig', () => {

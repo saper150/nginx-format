@@ -233,6 +233,10 @@ export class FormatedEmitter {
             group => this.generateIndent(level) + group.map(x => x.image).join(' ')
         ).join(this.options.newLineSeparator)
 
+        if (statement.block.length && statement.blockStart === statement.block[0].startLine) {
+            res += this.options.newLineSeparator
+        }
+
         res += this.block(statement.block, level + 1, statement.blockStart)
 
         let lastLine = lastElement(statement.block) ? lastElement(statement.block).endLine : statement.blockStart
