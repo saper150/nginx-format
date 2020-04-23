@@ -1,5 +1,5 @@
 import { Visitor } from "./visitor"
-import { FormatedEmitter } from "./emitter"
+import { FormatterEmitter } from "./emitter"
 import { Lexer } from "./tokenizer"
 import { Parser } from "./parser"
 
@@ -29,13 +29,13 @@ export function nginxFormat(
         throw new Error('Syntax Error: ' + JSON.stringify(lexingResult.errors))
     }
     Parser.input = lexingResult.tokens
-    
+
     const ctx = (Parser as any).Block()
         if(Parser.errors.length) {
             throw new Error('Parsing Error:' + JSON.stringify(Parser.errors))
         }
     const ast = visitor.visit(ctx)
 
-    return new FormatedEmitter(mergedOptions).generateOutput(ast, lexingResult.groups.Comment)
+    return new FormatterEmitter(mergedOptions).generateOutput(ast, lexingResult.groups.Comment)
 
 }

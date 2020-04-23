@@ -391,7 +391,6 @@ http {
 	},
 
 	{
-		only: false,
 		input: `
 http {end 123;
 }`,
@@ -399,9 +398,83 @@ http {end 123;
 http {
 	end 123;
 }`,
-		message: 'should statement on the same line that block to next line'
+		message: 'should put statement on the same line that block to next line'
 	},
 
+	{
+		only: false,
+		input: `
+http {
+	statement 1; statement 2;
+}`,
+		expect: `
+http {
+	statement 1;
+	statement 2;
+}`,
+		message: 'break same line statements 1'
+	},
+
+	{
+		only: false,
+		input: `
+http {
+	statement 
+	1; statement 2;
+}`,
+		expect: `
+http {
+	statement 1;
+	statement 2;
+}`,
+		message: 'break same line statements 2'
+	},
+
+
+	{
+		input: `
+http {
+	rewrite ^(.*)$ https://\${server_name}$1 permanent;
+}`,
+		expect: `
+http {
+	rewrite ^(.*)$ https://\${server_name}$1 permanent;
+}`,
+		message: 'string interpolation'
+	},
+
+	{
+		input: `
+set $foo = 'foo';
+set $foobar "\${foo}bar";`,
+		expect: `
+set $foo = 'foo';
+set $foobar "\${foo}bar";`,
+		message: 'string interpolation'
+	},
+
+	{
+		input: `
+location ~ "/img/([0-9a-fA-F]{2})([0-9a-fA-F]+)$";`,
+		expect: `
+location ~ "/img/([0-9a-fA-F]{2})([0-9a-fA-F]+)$";`,
+		message: 'regex with braces'
+	},
+
+
+// 	{
+// 		input: `
+// http {
+// 	statement
+// 		#cool
+// 	1; statement 2; # comm
+// }`,
+// 		expect: `
+// http {
+// 	statement 1; statement 2; #comment
+// }`,
+// 		message: 'should not duplicate comments when braking line'
+// 	},
 
 ]
 

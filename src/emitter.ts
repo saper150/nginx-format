@@ -7,7 +7,7 @@ function lastElement<T>(arr: T[]): T {
     return arr[arr.length - 1]
 }
 
-export class FormatedEmitter {
+export class FormatterEmitter {
 
     constructor(private options: Required<IFormatingOptions>) { }
 
@@ -141,10 +141,13 @@ export class FormatedEmitter {
 
             lineDiff = el.startLine - lastLine
             lastLine = el.endLine
+            if(lineDiff === 0 && el.startLine !== 1) {
+                lineDiff = 1
+            }
             res += this.options.newLineSeparator.repeat(lineDiff)
             res += this.statement(el, level)
         }
-
+ 
         return res
     }
 
@@ -232,10 +235,6 @@ export class FormatedEmitter {
         let res = groups.filter(x => x.length).map(
             group => this.generateIndent(level) + group.map(x => x.image).join(' ')
         ).join(this.options.newLineSeparator)
-
-        if (statement.block.length && statement.blockStart === statement.block[0].startLine) {
-            res += this.options.newLineSeparator
-        }
 
         res += this.block(statement.block, level + 1, statement.blockStart)
 
