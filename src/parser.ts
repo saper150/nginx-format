@@ -1,8 +1,5 @@
 import { AllTokens } from "./tokenizer"
-import * as chevrotain from 'chevrotain/lib/chevrotain'
-
-
-
+import * as chevrotain from 'chevrotain'
 
 class ParserClass extends chevrotain.CstParser {
     constructor() {
@@ -20,8 +17,6 @@ class ParserClass extends chevrotain.CstParser {
 
 
         this.RULE("Statement", () => {
-            this.CONSUME(AllTokens.Text)
-
             this.MANY1(() => {
                 this.SUBRULE((this as any).Argument)
             })

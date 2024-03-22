@@ -1,6 +1,6 @@
 
 import { Parser } from './parser'
-import { IToken } from 'chevrotain/lib/chevrotain'
+import { IToken } from 'chevrotain'
 
 export interface ASTElement {
     type: 'blockStatement' | 'statement' | 'comment'
@@ -26,13 +26,14 @@ export class Visitor extends Parser.getBaseCstVisitorConstructor() {
 
     Statement(ctx): ASTElement {
         const isBlockStatement = !!ctx.Block
+        const firstArgument = (ctx.Argument[0].children.Text || ctx.Argument[0].children.StringLiteral || ctx.Argument[0].children.StringLiteral2)[0]
+
         if (isBlockStatement) {
             return {
                 type: 'blockStatement',
-                startLine: ctx.Text[0].startLine,
+                startLine: firstArgument.startLine,
                 endLine: ctx.RCurly[0].startLine,
                 elements: [
-                    ctx.Text[0],
                     ...(ctx.Argument || []).map(x => this.visit(x)),
                     ctx.LCurly[0],
                 ],
@@ -42,10 +43,9 @@ export class Visitor extends Parser.getBaseCstVisitorConstructor() {
         } else {
             return {
                 type: 'statement',
-                startLine: ctx.Text[0].startLine,
+                startLine: firstArgument.startLine,
                 endLine: ctx.Semicolon[0].startLine,
                 elements: [
-                    ctx.Text[0],
                     ...(ctx.Argument || []).map(x => this.visit(x)),
                     ctx.Semicolon[0]
                 ],

@@ -461,6 +461,25 @@ location ~ "/img/([0-9a-fA-F]{2})([0-9a-fA-F]+)$";`,
 		message: 'regex with braces'
 	},
 
+	{
+		input: `
+map $imgformat $pimgformat {
+	default "png";
+	".png" "png";
+".jpeg" "jpeg";
+}`,
+		expect: `
+map $imgformat $pimgformat {
+	default "png";
+	".png" "png";
+	".jpeg" "jpeg";
+}`,
+	message: 'directive in quotes'
+},
+
+
+
+
 
 // 	{
 // 		input: `

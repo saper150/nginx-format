@@ -1,5 +1,5 @@
 
-import * as chevrotain from 'chevrotain/lib/chevrotain'
+import * as chevrotain from 'chevrotain'
 
 const createToken = chevrotain.createToken
 
